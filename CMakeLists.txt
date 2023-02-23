@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
 project(Bonxai)
 
+set(CMAKE_BUILD_TYPE "Debug")
+
 #---- Compile i nRelease by default ----
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   message(STATUS "Setting build type to 'Release' as none was specified.")
@@ -29,8 +31,8 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 #---- Options ----
-option(BENCHMARK_OCTOMAP "Benchmark against Octomap" ON)
-option(BENCHMARK_OPENVDB "Benchmark against OpenVDB" ON)
+option(BENCHMARK_OCTOMAP "Benchmark against Octomap" OFF)
+option(BENCHMARK_OPENVDB "Benchmark against OpenVDB" OFF)
 option(BENCHMARK_LAMA "Benchmark against LaMa"   OFF)
 
 find_package(benchmark REQUIRED)
@@ -63,6 +65,7 @@ if( BENCHMARK_OCTOMAP )
     list(APPEND BENCHMARK_DEPENDENCIES ${OCTOMAP_LIBRARIES})
 endif()
 
+set(BENCHMARK_OPENVDB OFF)
 if( BENCHMARK_OPENVDB )
     set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "/usr/local/lib/cmake/OpenVDB/")
     find_package(OpenVDB REQUIRED)
@@ -88,7 +91,6 @@ endif()
 #    list(APPEND BENCHMARK_DEPENDENCIES Open3D::Open3D)
 #endif()
 
-
 include_directories( include )
 
 message(${BENCHMARK_DEPENDENCIES})
@@ -105,5 +107,6 @@ endif()
 
 add_executable(test_serialization test/test_serialization.cpp )
 
-
-
+find_package(fcl)
+add_executable(test_fcl test/test_fcl_integration.cpp)
+target_link_libraries(test_fcl fcl)
